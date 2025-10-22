@@ -41,7 +41,7 @@ export class Scraper {
       // 等待内容加载
       await page.waitForTimeout(2000);
 
-      // 提取所有考试链接
+      // 提取所有考试链接并按发布日期排序
       const links = await page.evaluate(() => {
         const items = document.querySelectorAll('.w-al-unit.w-list-item');
         const results = [];
@@ -68,9 +68,20 @@ export class Scraper {
 
       console.log(`✅ 找到 ${links.length} 条考试通知`);
 
+      // 按发布日期排序（最新的在前）
+      const sortedLinks = links.sort((a, b) => {
+        if (!a.publishDate || !b.publishDate) return 0;
+        return b.publishDate.localeCompare(a.publishDate);
+      });
+
+      // 只保留最新的N条（可配置）
+      const maxRecent = this.config.maxRecentNotifications || 3;
+      const recentLinks = sortedLinks.slice(0, maxRecent);
+      console.log(`📌 只抓取最新的 ${recentLinks.length} 条通知（优化性能）`);
+
       // 转换为完整URL
       const baseUrl = new URL(this.config.url);
-      return links.map(link => ({
+      return recentLinks.map(link => ({
         ...link,
         url: link.url.startsWith('http')
           ? link.url

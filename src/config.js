@@ -33,6 +33,9 @@ export function loadConfig() {
     // 并发设置
     concurrency: config.concurrency || 3,
 
+    // 抓取数量限制（只抓取最新的N条通知）
+    maxRecentNotifications: config.max_recent_notifications || 3,
+
     // 通知配置
     notificationEnabled: !!notificationToken, // 有Token就启用
     notificationType: notificationType, // 'serverchan' or 'pushplus'

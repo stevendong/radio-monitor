@@ -114,6 +114,7 @@ npm start
   "locations": ["广州", "深圳", "东莞"],
   "exclude_keywords": ["取消", "推迟"],
   "include_keywords": ["报名通知"],
+  "max_recent_notifications": 3,
   "timeout": 30000,
   "concurrency": 3
 }
@@ -127,6 +128,7 @@ npm start
 | `locations` | 数组 | 地点筛选 | `["广州", "深圳"]` |
 | `exclude_keywords` | 数组 | 排除包含这些关键词的通知 | `["取消", "推迟"]` |
 | `include_keywords` | 数组 | 只保留包含这些关键词的通知 | `["报名通知"]` |
+| `max_recent_notifications` | 数字 | 只抓取最新N条通知（性能优化） | `3`（默认值） |
 | `timeout` | 数字 | 页面加载超时（毫秒） | `30000` |
 | `concurrency` | 数字 | 并发抓取数量 | `3` |
 

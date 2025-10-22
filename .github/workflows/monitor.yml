@@ -27,7 +27,18 @@ jobs:
       - name: 🔧 安装依赖
         run: npm ci
 
+      # 缓存Playwright浏览器，避免每次重新下载（约100MB）
+      - name: 💾 缓存Playwright浏览器
+        uses: actions/cache@v3
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: 🌐 安装Playwright浏览器
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium --with-deps
 
       - name: 🔍 运行监控
