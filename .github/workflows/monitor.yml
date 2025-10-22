@@ -1,0 +1,80 @@
+name: 考试监控
+
+on:
+  schedule:
+    # 每小时运行一次（UTC时间）
+    - cron: '0 * * * *'
+
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # 允许提交数据文件
+
+    steps:
+      - name: 📥 Checkout代码
+        uses: actions/checkout@v3
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 🔧 安装依赖
+        run: npm ci
+
+      - name: 🌐 安装Playwright浏览器
+        run: npx playwright install chromium --with-deps
+
+      - name: 🔍 运行监控
+        env:
+          MONITOR_CONFIG: ${{ vars.MONITOR_CONFIG }}
+          NOTIFICATION_TOKEN: ${{ secrets.NOTIFICATION_TOKEN }}
+          NOTIFICATION_TYPE: ${{ vars.NOTIFICATION_TYPE }}
+        run: npm start
+
+      - name: 💾 提交结果
+        run: |
+          git config --local user.name "GitHub Action"
+          git config --local user.email "action@github.com"
+          git add exams.json notified_exams.json
+          git diff --quiet && git diff --staged --quiet || \
+            git commit -m "Update: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          git push
+
+      - name: 📊 生成报告
+        if: always()
+        run: |
+          echo "## 📊 监控报告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f exams.json ]; then
+            node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('exams.json', 'utf-8'));
+
+            console.log(\`- ⏰ 更新时间: \${data.lastUpdated}\`);
+            console.log(\`- 📋 总共找到: \${data.summary.totalFound} 条\`);
+            console.log(\`- 🔮 未来考试: \${data.summary.futureExams} 条\`);
+            console.log(\`- ✅ 匹配条件: \${data.summary.matched} 条\`);
+            console.log(\`- 🆕 新增考试: \${data.summary.newExams || 0} 条\`);
+            console.log('');
+
+            if (data.exams.length > 0) {
+              console.log('### 匹配的考试');
+              console.log('');
+              data.exams.forEach((exam, i) => {
+                console.log(\`\${i + 1}. **\${exam.title}**\`);
+                console.log(\`   - 📅 考试日期: \${exam.examDate || '未知'}\`);
+                console.log(\`   - 📍 地点: \${exam.locations.join(', ') || '未知'}\`);
+                console.log(\`   - 📝 类型: \${exam.examTypes.join(', ') || '未知'}\`);
+                console.log(\`   - 🔗 [查看详情](\${exam.url})\`);
+                console.log('');
+              });
+            }
+            " >> $GITHUB_STEP_SUMMARY
+          fi

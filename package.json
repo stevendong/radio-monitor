@@ -1,0 +1,17 @@
+{
+  "name": "radio-monitor",
+  "version": "1.0.0",
+  "description": "B类无线电考试自动监控",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node src/index.js"
+  },
+  "keywords": ["radio", "exam", "monitor"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "playwright": "^1.40.0"
+  }
+}
