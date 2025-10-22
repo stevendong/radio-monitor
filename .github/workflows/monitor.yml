@@ -2,8 +2,8 @@ name: 考试监控
 
 on:
   schedule:
-    # 每小时运行一次（UTC时间）
-    - cron: '0 * * * *'
+    # 每小时运行一次（北京时间9:00-20:00，即UTC 1:00-12:00）
+    - cron: '0 1-12 * * *'
 
   workflow_dispatch:  # 允许手动触发
 
