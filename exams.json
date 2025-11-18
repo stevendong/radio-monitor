@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-11-18T01:32:56.784Z",
+  "lastUpdated": "2025-11-18T02:34:09.057Z",
   "config": {
     "examTypes": [
       "B类"
@@ -13,9 +13,9 @@
     "includeKeywords": []
   },
   "summary": {
-    "totalFound": 1,
+    "totalFound": 3,
     "matched": 0,
-    "futureExams": 0,
+    "futureExams": 1,
     "newExams": 0
   },
   "exams": []
